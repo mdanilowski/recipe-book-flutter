@@ -1,0 +1,4 @@
+enum LoginMethod {
+  password,
+  google;
+}

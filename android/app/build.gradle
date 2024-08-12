@@ -1,0 +1,122 @@
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def debugKeystoreProperties = new Properties()
+def debugKeystorePropertiesFile = rootProject.file('key/debug-keystore.properties')
+def debugKeystoreExists = debugKeystorePropertiesFile.exists()
+if (debugKeystoreExists) {
+    debugKeystoreProperties.load(new FileInputStream(debugKeystorePropertiesFile))
+}
+
+
+def releaseKeystoreProperties = new Properties()
+def releaseKeystorePropertiesFile = rootProject.file('key/release-keystore.properties')
+def releaseKeystoreExists = releaseKeystorePropertiesFile.exists()
+if (releaseKeystoreExists) {
+    releaseKeystoreProperties.load(new FileInputStream(releaseKeystorePropertiesFile))
+}
+
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'com.google.gms.google-services'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
+android {
+    namespace "pl.mdanilowski.recipeBook"
+    compileSdkVersion 34
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        applicationId "pl.mdanilowski.recipeBook"
+        // You can update the following values to match your application needs.
+        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
+        minSdkVersion 23
+        targetSdkVersion 34
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+    }
+
+    signingConfigs {
+        release {
+            if (releaseKeystoreExists) {
+                keyAlias = releaseKeystoreProperties['KeyAlias']
+                keyPassword = releaseKeystoreProperties['KeyPassword']
+                storeFile = file(releaseKeystoreProperties['StoreFile'])
+                storePassword = releaseKeystoreProperties['StorePassword']
+            }
+        }
+
+        debug {
+            if (debugKeystoreExists) {
+                keyAlias = debugKeystoreProperties['KeyAlias']
+                keyPassword = debugKeystoreProperties['KeyPassword']
+                storeFile = file(debugKeystoreProperties['StoreFile'])
+                storePassword = debugKeystoreProperties['StorePassword']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            debuggable false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (releaseKeystoreExists) {
+                signingConfig signingConfigs.release
+            }
+        }
+
+        debug {
+            debuggable true
+            minifyEnabled false
+            if (debugKeystoreExists) {
+                signingConfig signingConfigs.debug
+            }
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation platform('com.google.firebase:firebase-bom:33.1.2')
+    implementation 'com.google.firebase:firebase-analytics'
+}
