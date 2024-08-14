@@ -1,4 +1,4 @@
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:recipe_book/domain/use_cases/recipes/get_recipes_use_case.dart';
 import 'package:recipe_book/injectable/injectable.dart';

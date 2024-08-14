@@ -55,7 +55,6 @@ class LoginCubit extends Cubit<LoginState> {
         emit(const LoginState.authError());
       },
       (token) {
-        print('Got token: $token');
         emit(const LoginState.loggedInSuccessfully());
       },
     );

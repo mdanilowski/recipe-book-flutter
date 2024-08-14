@@ -16,7 +16,7 @@ class RemoteRecipesDataSourceImpl implements RemoteRecipesDataSource {
 
   @override
   Future<List<RemoteRecipe>> getUsersRecipes() async {
-    const String _query = r''' query UsersRecipes {
+    const String query = r''' query UsersRecipes {
   recipes {
     createdAt
     description
@@ -45,7 +45,7 @@ class RemoteRecipesDataSourceImpl implements RemoteRecipesDataSource {
 ''';
 
     final QueryOptions options = QueryOptions(
-      document: gql(_query),
+      document: gql(query),
     );
     final QueryResult result = await graphQlClient.query(options);
     final Map<String, dynamic>? data = result.data;

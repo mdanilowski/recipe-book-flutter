@@ -70,7 +70,6 @@ class _RecipesPageState extends State<RecipesPage> {
         recipe: recipes[index],
       ),
     );
-    return const SizedBox.shrink();
   }
 
   Widget _buildErrorView(AppError error) {
